@@ -10,6 +10,7 @@ import interact.IO;
 /**
  *
  * @author pthompso
+ * @version 2019-10-25
  */
 public class OthelloDriver {
 
