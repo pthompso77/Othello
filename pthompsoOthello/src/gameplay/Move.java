@@ -12,6 +12,7 @@ import java.util.Scanner;
 /**
  *
  * @author pthompso
+ * @version 2019-10-26
  */
 public class Move {
 
@@ -25,7 +26,10 @@ public class Move {
     @Override
     public String toString() {
 //        return "Move: to " + movePosition;
-                return ("Move to " + VisualBoard.getColumnTextValue(movePosition)
+        if (this.isPass()) {
+            return "Pass";
+        }
+        return ("Move to " + VisualBoard.getColumnTextValue(movePosition)
                  + VisualBoard.getRowTextValue(movePosition));
     }
     
@@ -51,7 +55,7 @@ public class Move {
     public Move(String passOrComment) {
         boolean isComment = (passOrComment.equals("C"));
         movePosition = (isComment) ? -2 : -1;
-        flippers = new ArrayList<Integer>();
+        flippers = new ArrayList<>();
     }
 // END constructors
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 

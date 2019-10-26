@@ -10,13 +10,14 @@ import interact.IO;
 /**
  *
  * @author pthompso
+ * @version 2019-10-26
  */
 public class OthelloDriver {
 
     private static int currentPlayer;
     private static int MYVALUE;
     private static int OPPONENTVALUE; //to keep track of who is whom
-    public static final boolean isdebug = true;
+    public static final boolean isdebug = false;
 
     public static void main(String[] args) {
         @SuppressWarnings("UnusedAssignment")
