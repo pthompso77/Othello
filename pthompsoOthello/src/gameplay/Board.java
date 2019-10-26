@@ -11,6 +11,7 @@ import java.util.ArrayList;
 /**
  *
  * @author pthompso
+ * @version 2019-10-26
  */
 public class Board {
 
@@ -227,10 +228,13 @@ public class Board {
         ArrayList<Integer> toBeFlipped = new ArrayList<>();
         for (int dir : DIRECTIONS) {
             if (endEarly && !toBeFlipped.isEmpty()) {
-                System.out.println("C Game isn't over -- I checked");
+//                System.out.println("C Game isn't over -- I checked");
+                System.out.println("C There is still at least one valid move -- I checked");
                 return toBeFlipped;
             }
-            toBeFlipped.addAll(exploreDirectionFromSpace(dir, spaceOnBoard, player));
+            ArrayList toAdd = exploreDirectionFromSpace(dir, spaceOnBoard, player);
+            if (OthelloDriver.isdebug) System.out.println("C flips toAdd: " + toAdd.toString());
+            toBeFlipped.addAll(toAdd);
 //            currentSpace = spaceOnBoard + dir; //advance one space in this direction
 //            System.out.println("C ");
 //            if (board[currentSpace] == otherPlayer) {
@@ -255,7 +259,10 @@ public class Board {
                 s = VisualBoard.seeColRowFromLocation(i);
                 System.out.print("C " + s + ", ");
             }
-            System.out.println("\b\b");
+//            System.out.println("\b\b");
+        }
+        else {
+            System.out.println("C No flippers found for this move");
         }
 
         return toBeFlipped;
@@ -303,12 +310,22 @@ public class Board {
 
     boolean isGameOver() {
         ArrayList<Integer> spaces = getAllEmptySpaces();
-        ArrayList flipps;
+        ArrayList allFlipps, blackFlips, whiteFlips;
+        allFlipps = new ArrayList<>();
         for (int space : spaces) {
             for (int dir : DIRECTIONS) {
-                flipps = exploreDirectionFromSpace(dir, space, 1);
-                flipps.addAll(exploreDirectionFromSpace(dir, space, -1));
-                if (!flipps.isEmpty()) {
+                blackFlips = exploreDirectionFromSpace(dir, space, BLACKINT);
+                allFlipps.addAll(blackFlips);
+                    //debug
+                    if (OthelloDriver.isdebug) System.out.println("C blackFlips: " 
+                                + blackFlips.toString());
+                whiteFlips = exploreDirectionFromSpace(dir, space, WHITEINT);
+                allFlipps.addAll(whiteFlips);
+                    //debug
+                    if (OthelloDriver.isdebug) System.out.println("C whiteFlips: " 
+                                + whiteFlips.toString());
+//                allFlipps.addAll(exploreDirectionFromSpace(dir, space, -1));
+                if (!allFlipps.isEmpty()) {
                     System.out.println("C Game isn't over -- I checked");
                     return false;
                 }
