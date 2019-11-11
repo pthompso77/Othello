@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package gameplay;
 
 import interact.IO;
@@ -10,22 +6,22 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- *
+ * Reformatting and Rewriting to streamline and simplify
  * @author pthompso
- * @version 2019-10-26
+ * @version 2019-11-09
  */
 public class Move {
 
     private int evaluatedWorth;
     private int movePosition;
-//    private int endPosition = Integer.MIN_VALUE; //TODO did this break anything?
     private ArrayList<Integer> flippers;
     public static Move passMove = new Move("pass");
+    public static final int PASS_POSITION = -1;
     public static Move commentMove = new Move("C");
+    public static final int COMMENT_POSITION = -2;
 
     @Override
     public String toString() {
-//        return "Move: to " + movePosition;
         if (this.isPass()) {
             return "Pass";
         }
@@ -54,7 +50,13 @@ public class Move {
 
     public Move(String passOrComment) {
         boolean isComment = (passOrComment.equals("C"));
-        movePosition = (isComment) ? -2 : -1;
+        movePosition = (isComment) ? COMMENT_POSITION : PASS_POSITION;
+        flippers = new ArrayList<>();
+    }
+    
+    //only added to add Dr. Mec's code from Evaluation.alphaBeta
+    public Move() {
+        movePosition = PASS_POSITION;
         flippers = new ArrayList<>();
     }
 // END constructors
