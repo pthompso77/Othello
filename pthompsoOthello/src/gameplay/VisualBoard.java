@@ -1,14 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package gameplay;
 
 /**
- *
+ * Reformatting and Rewriting to streamline and simplify
  * @author pthompso
- * @version 2019-10-26
+ * @version 2019-11-09
  */
 public class VisualBoard {
 
@@ -20,7 +16,7 @@ public class VisualBoard {
     public static final char WHITE_VISUAL = 'W';
 
     public static final char BLACK_VISUAL = 'B';
-    private static final char[] VALUE_VISUAL_ASSOC
+    static final char[] VALUE_VISUAL_ASSOC
             = {'*', WHITE_VISUAL, EMPTY_VISUAL, BLACK_VISUAL};
 
     private static void printArrayBoard(int[] board) {
@@ -75,7 +71,8 @@ public class VisualBoard {
         try {
             return COLUMN_LABELS[moveLocation % 10];
         } catch (ArrayIndexOutOfBoundsException ex) {
-            System.out.println("C Exception: " + ex.getMessage());
+            System.out.println("C Exception in VB.getColumnTextValue: moveLocation=" + moveLocation
+                    + "\nC"+ex.getMessage());
             return (moveLocation == -1) ? 'P' : '!';
         }
     }

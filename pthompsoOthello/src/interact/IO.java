@@ -29,6 +29,11 @@ public class IO {
         return intToText.get(p);
     }
 
+    /**
+     *
+     * @param currentPlayer
+     * @return
+     */
     public static String getOpponentMove(int currentPlayer) {
         String player = intToText.get(currentPlayer);
         System.out.println("C Ready for your move (" + player + "): ");
@@ -39,27 +44,17 @@ public class IO {
     }
 
     public static int getCurrentPlayer() {
-        return getCurrentPlayer(true);
-    }
-
-    public static int getCurrentPlayer(boolean regularplay) {
         ask = new Scanner(System.in);
-        char p;
-        if (regularplay) {
-            System.out.println("C Please initiate color (I W or I B):");
-//            String ps = ask.nextLine();
-//            System.out.println("C Got: " + ps);
-            p = ask.nextLine().toUpperCase().charAt(2);
-        } else {
-            p = ask.nextLine().toUpperCase().charAt(0);
-        }
+        char playerToInitialize;
+        System.out.println("C Please initiate color (I W or I B):");
+        playerToInitialize = ask.nextLine().toUpperCase().charAt(2);
         int player;
-        if (p == VisualBoard.WHITE_VISUAL) {
+        if (playerToInitialize == VisualBoard.WHITE_VISUAL) {
             player = Board.WHITEINT;
         } else {
             player = Board.BLACKINT;
         }
-        System.out.println("R " + p);
+        System.out.println("R " + playerToInitialize);
         return player;
     }
 
@@ -76,6 +71,7 @@ public class IO {
             System.out.println("C " + playerText + " passes");
             String playerPassMessage = intToText.get(currentPlayer);
             System.out.println(playerPassMessage);
+            return;
         }
         if (currentMove.isComment()) {
             return;
@@ -92,6 +88,18 @@ public class IO {
 
     public static char getColorTextValue(int currentPlayer) {
         return intToText.get(currentPlayer).charAt(0);
+    }
+
+    /**
+     * for testing (user input)
+     *
+     * @return true if Yes, false if No
+     */
+    public static boolean getYesFromUser(String message) {
+        System.out.print(message + " -- Y or N:");
+        String input = ask.nextLine();
+        input = input.substring(0, 1);
+        return (input.equalsIgnoreCase("Y"));
     }
 
 }

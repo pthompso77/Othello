@@ -1,17 +1,16 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package gameplay;
 import java.util.ArrayList;
 
 /**
- *
+ * Reformatting and Rewriting to streamline and simplify
  * @author pthompso
- * @version 2019-10-26
+ * @version 2019-11-09
  */
-class BoardHandler {
+class BoardActor {
+    
+    //for testing
+    
 
 
     static void updateBoardAfterMove(Move thisMove, Board gameboard, int color) {
@@ -41,10 +40,18 @@ class BoardHandler {
         }
         //            (return board?)
     }
+    
+    static int countPiecesWithColor(int color, Board b) {
+        int count = 0;
+        for (int space : b.getBoard()) {
+            if (space == color) count++;
+        }
+        return count;
+    }
 
     
 
-    //    ===== BoardHandler =====
+    //    ===== BoardActor =====
     //fun 8. Flip the pieces(board, flippers list):
     //	for each flipper:
     //		set board location at flipper <- (-1 * flipper)
