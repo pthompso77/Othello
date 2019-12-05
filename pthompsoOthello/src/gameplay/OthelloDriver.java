@@ -5,40 +5,48 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Reformatting and Rewriting to streamline and simplify
+ * Cleaning up for final submission
  *
  * @author pthompso
- * @version 2019-11-09
+ * @version 2019-12-02
  */
 public class OthelloDriver {
 
-    private static int currentPlayer;
+    private static int currentPlayer; //swaps with every turn change
     private static int MYVALUE;
     private static int OPPONENTVALUE; //to keep track of who is whom
     public static final boolean ISDEBUG = false;     //only change this here
     static int moveNumber = 0; //to keep track of the number of moves
+    public static int getMoveNumber() {return moveNumber;}
 
 //begin Timer
-    public int timeRemaining = 90; //declare a variable to keep track of remaining time ..... initialize at beginning of game
+    public int timeRemaining = 90000; //declare a variable to keep track of remaining time ..... initialize at beginning of game
     static int timeForMove;
     static Timer timer; //use this to start the interupt task
     public static boolean timeUP;  //boolean flag to check frequently for time up....this is set to true in the 
-    //interrupt task
 //end Timer
 
     OthelloDriver() {
     } //empty constructor
 
+    /**
+     * Main Gameplay constructs an OthelloDriver that calls the main playGame
+     * function
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         OthelloDriver driver = new OthelloDriver();
-        driver.playGame();
+        driver.playGame(args);
     }
 
-    void playGame() {
+    void playGame(String[] args) {
         Board gameboard = new Board();
         currentPlayer = Board.getBlackInt();
         //prints: Please initiate color (I W or I B)
-        MYVALUE = IO.getCurrentPlayer(); //Please initiate color (I W or I B)
+        if (args.length == 0) {
+            MYVALUE = IO.getCurrentPlayer(); //Please initiate color (I W or I B)
+        } else MYVALUE = 1;
         OPPONENTVALUE = (-1 * MYVALUE);
         gameboard.printBoard();
         while (!gameboard.isGameOver()) {
@@ -46,89 +54,58 @@ public class OthelloDriver {
                 System.out.println("C\nC\nC\tMove number " + moveNumber + "\nC"
                         + "Player is " + VisualBoard.VALUE_VISUAL_ASSOC[currentPlayer + 2]
                         + "\nC");
-                //currentMove ends up null!
                 Move currentMove = getMoveFromPlayer(gameboard, currentPlayer);
                 if (currentPlayer == MYVALUE) {
                     //print my move to std.out
                     IO.printMoveOutput(currentPlayer, currentMove);
                 }
-//            // Update the board
+                //Update the board
                 BoardActor.updateBoardAfterMove(currentMove, gameboard, currentPlayer);
-//timer code
-                if (!timeUP) {
-                    timer.cancel();
-                }
-                timeRemaining -= timeForMove;  //update the time remaining 
-                System.out.println("C Remaining Time: " + timeRemaining + ")");
-//my code
-                System.out.println("C ====== Board after last move " + currentMove + " ======");
+                System.out.println("C ====== Board after last move: " + currentMove + " ======");
                 gameboard.printBoard();
-                currentPlayer *= -1;
+                currentPlayer *= -1; // swap players
             } catch (Exception e) {
-                System.out.println("C Exception: " + e.getMessage());
+                System.out.println("C playGame Exception: " + e.getMessage()+"\n"+e.getCause());
+                try {
+                    timer.cancel(); //maybe?
+                } catch (Exception e2) {
+                    System.out.println("C playGame timer Exception: " + e2.getMessage());
+                }
             }
         }
     }
 
-    private /*static*/ Move getMoveFromPlayer(Board gameboard, int player) {
+    private Move getMoveFromPlayer(Board gameboard, int player) {
 //Timer Code 
         moveNumber++;
         timeUP = false;  //time up is false at the beginning of move
         timer = new Timer();  //initialize the new timer
-        //compute in seconds the amount of time for move
-//back to my code
-        Move nextMove = getMoveFromPlayer_orig(gameboard, player);
 //timer code
+        //compute in seconds the amount of time for move
         timeForMove = (int) (timeAllocation[moveNumber] * (double) timeRemaining);
         System.out.println("C Move Time:  " + timeForMove + ")");
         timer.schedule(new InterruptTask(), timeForMove * 1000);  //schedule the  interrupt task
+//back to my code
+        Move nextMove = getMoveFromPlayer_orig(gameboard, player);
+//timer code
+        if (!timeUP) {
+            timer.cancel();
+        }
+        timeRemaining -= timeForMove;  //update the time remaining 
+        System.out.println("C Remaining Time: " + timeRemaining + ")");
 //my code
         return nextMove;
     }
 
-    private /*static*/ Move getMoveFromPlayer_orig(Board gameboard, int player) {
-        if (ISDEBUG) {
-            System.out.println("C getMoveFromPlayer() has: player=" + player + " and MYVALUE=" + MYVALUE);
-        }
-        if (player == MYVALUE) {
-            // "computer" makes a move
-            Move m = gameboard.getNextMove(MYVALUE, true);
-
-            //TODO SOMETHING BREAKS RIGHT HERE
-            if (ISDEBUG) {
-                System.out.println("C getNextMove(mine) is " + m);
-            }
-            return m;
-        } else {
-            // opponent makes a move
-            Move o = gameboard.getNextMove(OPPONENTVALUE, false);
-            if (ISDEBUG) {
-                System.out.println("C getNextMove(other) is " + o);
-            }
-            return o;
+    private Move getMoveFromPlayer_orig(Board gameboard, int player) {
+        boolean isMe = (player == MYVALUE);
+        if (isMe) { // "computer" makes a move            
+            return gameboard.getNextMove(MYVALUE, isMe);
+        } else { // opponent makes a move            
+            return gameboard.getNextMove(OPPONENTVALUE, isMe);
         }
     }
 
-    static void ignore() {
-        //        DR MEC: =============================================================
-        //        Main Function:
-        //                Initialize Board:
-        //                        color <- Interact:: Get starting color from opponent
-        //                        gameboard <- Board:: New Board(color)
-        //                        Print "Playing as [color]"
-        //                        if (color is Black):
-        //                                currentPlayer = me
-        //                        else:
-        //                                currentPlayer = opponent
-        //                Print gameboard
-        //                while (Board: check if legal moves exist):
-        //                OR: while (?? : game is not over):
-        //                        currentMove <- Board:: Get Move (currentPlayer)
-        //                        Board:: Make this move (currentMove)
-    }
-
-//        DR MEC: =============================================================
-//Place the following code in your driver class
 //time array.....each position represents a percentage of the remaining time to be used
     static double timeAllocation[] = {0.015, 0.015, 0.015, 0.015, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025,
         0.048, 0.048, 0.048, 0.048, 0.048, 0.048, 0.050, 0.051, 0.052, 0.053,
@@ -138,38 +115,17 @@ public class OthelloDriver {
         0.181, 0.187, 0.196, 0.199, 0.220, 0.220, 0.220, 0.220, 0.220, 0.220,
         0.220, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250
     };
+    
+    
 
-    /**
-     * Mec stuff (copied) //Example get my move..... public Move getMyMove() {
-     *
-     * moveNumber++;
-     *
-     * timeUP = false; //time up is false at the beginning of move timer = new
-     * Timer(); //initialize the new timer
-     *
-     * // int timeForMove = (int) (timeAllocation[moveNumber] * (double)
-     * timeRemaining); // //compute in seconds the amount of time for move // //
-     * // System.out.print("(C Move Time: " + timeForMove + ")"); ////
-     * timer.schedule(new InterruptTask(), timeForMove * 1000); //schedule the
-     * interrupt task // myMoves = board.bestMove(moveNumber, treeMoves); //
-     * board.applyMove((Move) myMoves.first(), OthelloBoard.MINE); // if
-     * (!timeUP) { // timer.cancel(); // } // timeRemaining -= timeForMove;
-     * //update the time remaining // // System.out.print("(C Remaining Time: "
-     * + timeRemaining + ")"); // Move selectedMove = (Move) (myMoves.first());
-     * // return selectedMove; }
-     *
-     */
-//end Mec Stuff
 //define the interrupt task
     class InterruptTask extends TimerTask {
 
+        @Override
         public void run() {
             System.out.println("C ****>timeup)");
             timeUP = true;
             timer.cancel();
-//TODO undo this comments above
         }
     }
 }
-//}
-//}

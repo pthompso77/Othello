@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package interact;
 
 import gameplay.Board;
@@ -12,8 +8,9 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 /**
- *
+ * Cleaning up for final submission
  * @author pthompso
+ * @version 2019-12-02
  */
 public class IO {
 
@@ -30,19 +27,23 @@ public class IO {
     }
 
     /**
-     *
+     * Asks for and receives instruction from opponent player for the next move
      * @param currentPlayer
-     * @return
+     * @return everything the opponent typed
      */
     public static String getOpponentMove(int currentPlayer) {
         String player = intToText.get(currentPlayer);
         System.out.println("C Ready for your move (" + player + "): ");
         ask = new Scanner(System.in);
         String input = ask.nextLine();
-//        System.out.println("C input: " + input);
         return input;
     }
 
+    /**
+     * Ask Standard Input for which color to initialize as (B or W)
+     * prints R[B/W] when ready to play
+     * @return int representation of the color indicated by the input
+     */
     public static int getCurrentPlayer() {
         ask = new Scanner(System.in);
         char playerToInitialize;
@@ -77,21 +78,22 @@ public class IO {
             return;
         }
         int moveLocation = currentMove.getMovePosition();
-//        System.out.println("C " + playerText
-//                + " " + getColumnTextValue(moveLocation)
-//                + " " + getRowTextValue(moveLocation));
-// TODO is this right?
         System.out.println(playerText
                 + " " + VisualBoard.getColumnTextValue(moveLocation)
                 + " " + VisualBoard.getRowTextValue(moveLocation));
     }
 
+    /**
+     * Converts integer value to value of player's color
+     * @param currentPlayer integer value for the player
+     * @return the character representing the color (B or W)
+     */
     public static char getColorTextValue(int currentPlayer) {
         return intToText.get(currentPlayer).charAt(0);
     }
 
     /**
-     * for testing (user input)
+     * for testing (getting Y/N user input)
      *
      * @return true if Yes, false if No
      */

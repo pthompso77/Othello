@@ -6,33 +6,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * Reformatting and Rewriting to streamline and simplify
+ * Cleaning up for final submission
  * @author pthompso
- * @version 2019-11-09
+ * @version 2019-12-02
  */
 public class Board {
     
-    //for testing
-    static String peekBoard(Board b) {
-        int[] arr = b.getBoard();
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 100; i+=10) {
-            for (int j= 0; j < 10; j++) {
-                int value = arr[i+j]+2;
-                char visual = VisualBoard.VALUE_VISUAL_ASSOC[value];
-                sb.append(visual).append(" ");
-            }
-            sb.append("\n");
-        }
-        return sb.toString();
-    }
-
-    boolean debug;
-    {debug = OthelloDriver.ISDEBUG;}
-    boolean board_debug = false;
-    
-    //end testing
-
     int[] board; //[100]
     protected final int BOARDSIZE = 100;
     private final int FIRSTLEGALSPACE = 11;
@@ -64,10 +43,10 @@ public class Board {
         for (int s = 0; s < 10; s++) {
             board[s] = BORDER;
         }
+        // side borders and empty spaces (square)
         for (int row = 10; row < BOARDSIZE - 10; row += 10) {
             board[row] = BORDER;
             board[row + 9] = BORDER;
-            //            int square = row + 1;
             for (int square = 1; square < 9; square++) {
                 board[row + square] = EMPTYSPACE;
             }
@@ -83,22 +62,17 @@ public class Board {
         board[54] = black;
     }
 
+    // construct board with a specific array
+    // used by copyBoard()
     public Board(int[] arr) {
         board = arr;
-        if (debug) 
-        {System.out.println("C ===== Got this board! =====");
-            printBoard();
-        }
     }
 
     /**
      * Prints this gameboard to the output window
      */
     void printBoard() {
-        //    ===== Board =====
-        //    fun 0. Print board
         VisualBoard.printBoard(this);
-        //    ---
     }
 
     /**
@@ -111,17 +85,15 @@ public class Board {
      * move for this agent based on the evaluation
      */
     Move getNextMove(int currentPlayer, boolean isMe) {
-        // if current player is opponent, ask for move
+        // if current player is opponent, ask for move and return it
         if (!isMe) {
             String opponentInput = IO.getOpponentMove(currentPlayer);
             Move opponentMove = Move.parseInput(opponentInput);
-            if (debug) System.out.println("C got opponentMove: " + opponentMove);
             return opponentMove;
         }
         // if current player is ME, we rely on Player to evaluate moves and return the best
-        ArrayList movesList = Evaluation.populateMovesForPlayer(this, currentPlayer);
+        ArrayList movesList = Board.populateMovesForPlayer1(this, currentPlayer);
         return Player.getBestMove(this, movesList, currentPlayer);
-        //    ---
     }
 
     /**
@@ -181,30 +153,6 @@ public class Board {
      */
     private Move getLegalMove(int spaceOnBoard, int currentPlayer) {
         ArrayList toBeFlipped = findFlippers(spaceOnBoard, currentPlayer);
-//        int otherPlayer = (-1 * currentPlayer);
-//        int currentSpace, startSpace = spaceOnBoard;
-//        ArrayList<Integer> toBeFlipped = new ArrayList<>();
-//        for (int dir : DIRECTIONS) {
-        // find and add all the opponent pieces that will need to be flipped for this Move (if any)
-//            toBeFlipped.addAll(exploreDirectionFromSpace(dir, spaceOnBoard, currentPlayer));
-//            currentSpace = spaceOnBoard + dir; //advance one space in this direction
-//            if (board[currentSpace] == otherPlayer) {
-//                // start collecting opponent pieces that will need to be flipped
-//                ArrayList<Integer> toBeFlipped = new ArrayList<>();
-//                while (board[currentSpace] == otherPlayer) {
-//                    toBeFlipped.add(currentSpace);
-//                    currentSpace += dir;
-//                }
-//                if (board[currentSpace] == currentPlayer) //we found a move!
-//                {
-//                    return new Move(startSpace, currentSpace, toBeFlipped);
-//                }
-//            }
-//        }
-//        if (toBeFlipped.isEmpty()) { //then this is not a legal Move
-//            return Move.passMove;
-//        }
-//        else return new Move(spaceOnBoard, toBeFlipped);
         if (toBeFlipped.isEmpty()) { //then this is not a legal Move
             return Move.passMove;
         } else {
@@ -240,11 +188,18 @@ public class Board {
         return opponentPiecesFound;
     }
 
+    /**
+     * Calls findFlippers(int,int,boolean)
+     * boolean EndEarly is always False during normal gameplay
+     * the identical method above is used for testing only, when endEarly needs to be True
+     * @param spaceOnBoard
+     * @param player
+     * @return 
+     */
     ArrayList findFlippers(int spaceOnBoard, int player) {
         return findFlippers(spaceOnBoard, player, false);
     }
 
-    // findFlippers version 10-15
     /**
      * We are given a position for a move, and a player The goal is to find the
      * pieces in every direction that belong to the opponent
@@ -256,44 +211,18 @@ public class Board {
         for (int dir : DIRECTIONS) {
             if (endEarly && !toBeFlipped.isEmpty()) {
 //                System.out.println("C Game isn't over -- I checked");
-                if (debug) System.out.println("C There is still at least one valid move -- I checked");
                 return toBeFlipped;
             }
             ArrayList toAdd = exploreDirectionFromSpace(dir, spaceOnBoard, player);
-            if (OthelloDriver.ISDEBUG) {
-                if (board_debug) System.out.println("C flips toAdd: " + toAdd.toString());
-            }
             toBeFlipped.addAll(toAdd);
-//            currentSpace = spaceOnBoard + dir; //advance one space in this direction
-//            System.out.println("C ");
-//            if (board[currentSpace] == otherPlayer) {
-//                // start collecting opponent pieces that will need to be flipped
-//                ArrayList<Integer> tempFlips = new ArrayList<>();
-//                while (board[currentSpace] == otherPlayer) {
-//                    tempFlips.add(currentSpace);
-//                    currentSpace += dir;
-//                }
-//                if (board[currentSpace] == player) {
-//                    //we found a move!
-//                    toBeFlipped.addAll(tempFlips);
-//                }
-//            }
         }
         if (!toBeFlipped.isEmpty()) {
-            if (debug) System.out.println("C getting flippers for player: " + IO.playerInt_txt(player));
             String visualMove = VisualBoard.seeColRowFromLocation(spaceOnBoard);
-            if (debug) System.out.println("C foundFlippers for move " + visualMove + ": " + toBeFlipped);
             String s;
             for (int i : toBeFlipped) {
                 s = VisualBoard.seeColRowFromLocation(i);
-                if (debug) {
-                    System.out.print("C " + s + ", ");
-                }
             }
-//            System.out.println("\b\b");
-        } else {
-            if (debug) System.out.println("C No flippers found for this move");
-        }
+        } 
 
         return toBeFlipped;
     }
@@ -312,29 +241,23 @@ public class Board {
         int currentSpace;// = spaceOnBoard;
         ArrayList<Integer> toBeFlipped = new ArrayList<>();
         for (int dir : DIRECTIONS) {
-            if (debug) System.out.println("C now going in direction: " + dir);
             currentSpace = spaceOnBoard + dir; //advance one space in this direction
-            if (debug) System.out.println("C ");
             if (board[currentSpace] == otherPlayer) {
                 // start collecting opponent pieces that will need to be flipped
 
                 ArrayList<Integer> tempFlips = new ArrayList<>();
                 while (board[currentSpace] == otherPlayer) {
-                    if (debug) System.out.println("C nowSpace = " + currentSpace);
                     tempFlips.add(currentSpace);
                     currentSpace += dir;
-                    if (debug) System.out.println("C now nowSpace = " + currentSpace);
                 }
                 if (board[currentSpace] == player) {
                     //we found a move!
-                    if (debug) System.out.println("C found opponent at " + currentSpace);
 //                    thisMove.setEndPosition(currentSpace); 
                     toBeFlipped.addAll(tempFlips);
 //TODO rewrite this for opponent only (find flippers only, no setting end position)
                 }
             }
         }
-        if (debug) System.out.println("C Flippers = " + toBeFlipped);
         return toBeFlipped;
     }
 
@@ -346,21 +269,10 @@ public class Board {
             for (int dir : DIRECTIONS) {
                 blackFlips = exploreDirectionFromSpace(dir, space, BLACKINT);
                 allFlipps.addAll(blackFlips);
-                //debug
-                if (board_debug) {
-                    System.out.println("C blackFlips: "
-                            + blackFlips.toString());
-                }
                 whiteFlips = exploreDirectionFromSpace(dir, space, WHITEINT);
                 allFlipps.addAll(whiteFlips);
-                //debug
-                if (board_debug) {
-                    System.out.println("C whiteFlips: "
-                            + whiteFlips.toString());
-                }
 //                allFlipps.addAll(exploreDirectionFromSpace(dir, space, -1));
                 if (!allFlipps.isEmpty()) {
-                    if (debug) System.out.println("C Game isn't over -- I checked");
                     return false;
                 }
             }
@@ -391,32 +303,6 @@ public class Board {
 
     public static boolean isMoveValid(Board gameboard, int location, int player) {
         return gameboard.isMoveValid(location, player);
-    }
-
-    /**
-     * FOR TESTING ONLY
-     *
-     * @return the board that the program is hung up on
-     */
-    public static Board getDebugBoard() {
-//        int[]  boardArry = {        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,        -2, 0, 1, 1, 1, 0, -1, -1, -1, -2,        -2, 0, 0, 1, 1, 1, 1, -1, 1, -2,        -2, 0, 0, 1, 1, 1, 1, 1, 1, -2,        -2, 0, 0, 1, -1, -1, -1, -1, 0, -2,        -2, 0, 0, 1, -1, -1, 0, 0, 0, -2,        -2, 0, 1, 0, 0, 0, 0, 0, 0, -2,        -2, 0, 0, 0, 0, 0, 0, 0, 0, -2,        -2, 0, 0, 0, 0, 0, 0, 0, 0, -2,        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2        } ;
-        //{-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, 0, 0, 0, 0, 0, 0, 0, 0, -2, -2, 0, 0, 0, 0, 0, 0, 0, 0, -2, -2, 0, 0, 1, 1, 0, 0, 0, 0, -2, -2, 0, 0, -1, 1, -1, -1, 0, 0, -2, -2, 0, 0, 0, 1, 1, 0, 0, 0, -2, -2, 0, 0, 0, 0, 1, 0, 0, 0, -2, -2, 0, 0, 0, 0, 0, 0, 0, 0, -2, -2, 0, 0, 0, 0, 0, 0, 0, 0, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2};
-//        int[] temp = {-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -1, -1, -1, -1, -1, -1, -1, -1, -2, -2, -1, -1, -1, -1, -1, -1, -1, -1, -2, -2, -1, -1, -1, -1, -1, -1, -1, -1, -2, -2, -1, -1, -1, -1, -1, -1, -1, -1, -2, -2, -1, 1, -1, -1, -1, -1, -1, -1, -2, -2, -1, 1, 1, -1, -1, -1, -1, -1, -2, -2, -1, 0, 1, 1, 1, -1, -1, -1, -2, -2, -1, 0, 0, 0, 0, 0, -1, -1, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2};
-        int[] temp2 = {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,1,1,1,1,1,1,1,1,-2,-2,-1,-1,-1,-1,1,1,1,1,-2,-2,-1,-1,-1,1,1,1,1,1,-2,-2,0,-1,-1,1,1,1,1,1,-2,-2,0,-1,-1,-1,1,1,1,1,-2,-2,-1,-1,-1,-1,1,1,1,1,-2,-2,0,0,0,0,1,1,1,1,-2,-2,0,0,0,-1,-1,-1,-1,1,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2};
-        int[] temp3 = {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,0,0,0,0,0,0,0,0,-2,-2,0,0,0,0,0,1,0,0,-2,-2,0,0,0,1,1,0,0,0,-2,-2,0,0,-1,-1,-1,0,0,0,-2,-2,0,0,0,1,-1,0,0,0,-2,-2,0,0,0,0,0,0,0,0,-2,-2,0,0,0,0,0,0,0,0,-2,-2,0,0,0,0,0,0,0,0,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2};
-        int[] boardArry = temp3;
-        System.out.println("C ------- DEBUG BOARD ----------- ");
-        Board b = new Board(boardArry);
-//        b.printBoard();
-        return b;
-    }
-
-    //for testing
-    public static void main(String[] stuffs) {
-        Board b = getDebugBoard();
-        int moveLocation = 23;
-        int player = -1;
-        ArrayList arry = b.findFlippers(moveLocation, player);
     }
 
     /**

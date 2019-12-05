@@ -5,13 +5,11 @@ import interact.IO;
 import java.util.ArrayList;
 
 /**
- * Reformatting and Rewriting to streamline and simplify
+ * Cleaning up for final submission
  * @author pthompso
- * @version 2019-11-09
+ * @version 2019-12-02
  */
 class Player {
-
-    final static boolean isDebug = OthelloDriver.ISDEBUG;
 
     /**
      * (old) Uses an evaluation function to score each move in a list to find
@@ -27,19 +25,12 @@ class Player {
         try {
             if (!movesList.isEmpty()) {
                 Object bestMove = movesList.get(0);
-                if (isDebug) System.out.println("C Player.getBestMove has " + bestMove);
                 assert bestMove instanceof Move : "Object is not a Move type";
                 return (Move) bestMove;
             }
         } catch (NullPointerException e) {
             System.out.println("C NullPointerException " + e.getMessage());
         }
-        //            initialize data structure (max heap?)
-        //            iterate through Moves list:
-        //                    9. set move.value <- Evaluate move
-        //                    10. place Move in data structure, in correct order
-        //            return best Move
-        //    ---
         return new Move("pass");
     }
 
@@ -66,124 +57,9 @@ class Player {
      */
     static Move getBestMove(Board gameboard, ArrayList<Move> movesList, int currentPlayer) {
 
+        return Evaluation_orig.ab_getMyMove(gameboard, movesList, currentPlayer);
 
-        /* Maybe use an ArrayList?
-        //            initialize data structure (max heap?)
-        ArrayList<MoveWithValue> bestMoves = new ArrayList<>(); //to keep track of best moves!
-        //            iterate through Moves list:
-        int moveValue;
-         */
-
- /* or maybe use a MaxHeap? */
-//        MaxHeap bestMoves = new MaxHeap();
-//        for (Move m : movesList) {
-////            moveValue = evaluateMove(m);
-//            bestMoves.addAfterEvaluating(gameboard, m);
-//        }
-//        return bestMoves.getBest();
-
-        /* or maybe use AlphaBeta itself? */
-        
-        
-        
-        
-        
-        // + + + + + + + CURRENT WORK + + + + + ++ + + ++ ++ + + + + + + + + + + + + 
-        //TODO does currentPlayer match color??? (it should be...)
-        return Evaluation.ab_getMyMove(gameboard, currentPlayer);
-
-        // + + + + + + + CURRENT WORK + + + + + ++ + + ++ ++ + + + + + + + + + + + + 
-        
-        
-        
-        
     }
 
-    //    ===== Player =====
-    //fun 9, Evaluate move(move), returns int?:
-    //	--for now?
-    //	return a million
-    //---
-    //===== Player? =====
-    //fun 10. Place Move in data structure:
-    //	(can skip this for now)
-    private static class MaxHeap //implements java.util.Collection
-    {
-
-        final boolean isDebug = OthelloDriver.ISDEBUG;
-
-        ArrayList<MoveWithValue> heap;
-
-        private MaxHeap() {
-            //TODO?
-        }
-
-        private boolean add(MoveWithValue m) {
-            heap.add(m);
-            //TODO arrange MaxHeap properly
-            return true;
-        }
-
-
-        private MoveWithValue get(int index) {
-            return heap.get(index);
-        }
-
-        private Move getMoveAtIndex(int index) {
-            MoveWithValue mv = heap.get(index);
-            return mv.getMove();
-        }
-
-        private Move getBest() {
-            //TODO re-write this with actual MaxHeap implementation
-            try {
-                if (heap.isEmpty()) {
-                    return Move.passMove;
-                }
-            } catch (NullPointerException e) {
-                System.out.println("C\tWoops...at Move.getBest()" + e.getMessage());
-                if (isDebug) {
-                    if (IO.getYesFromUser("C\tContinue?")) {
-                        return Move.passMove;
-                    } else {
-                        System.out.println("End here.");
-                        System.exit(0);
-                    }
-                }
-                return Move.passMove;
-            }
-            MoveWithValue best = heap.get(0);
-            for (MoveWithValue mv : heap) {
-                if (mv.isBetterThan(best)) {
-                    best = mv;
-                }
-            }
-            return best.getMove();
-        }
-
-        private static class MoveWithValue {
-
-            Move move;
-            int value;
-
-            MoveWithValue(Move setMove, int setValue) {
-                move = setMove;
-                value = setValue;
-            }
-
-            Move getMove() {
-                return move;
-            }
-
-            int getValue() {
-                return value;
-            }
-
-            private boolean isBetterThan(MoveWithValue best) {
-                return (this.value > best.getValue());
-            }
-
-        }
-    }
 
 }

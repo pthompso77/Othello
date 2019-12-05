@@ -3,15 +3,27 @@ package gameplay;
 import java.util.ArrayList;
 
 /**
- * Reformatting and Rewriting to streamline and simplify
- * Holds methods for evaluating boards for best moves
+ * Holds methods for evaluating boards for best moves Cleaning up for final
+ * submission
+ *
  * @author pthompso
- * @version 2019-11-09
+ * @version 2019-12-02
  */
-
 public class Evaluation_orig {
 
     static final boolean evalPrint = false;
+    static Move currentMoveBeingEvaluated;
+    static int currentPlayerBeingEvaluated;
+    static String[] playerColors = {"White", "0", "Black"};
+
+    static String playerColor(int i) {
+        return playerColors[i + 1];
+    }
+
+    static String playerColor() {
+        return playerColors[currentPlayerBeingEvaluated + 1];
+    }
+
     static double evalCount = 0;
     private static final int PLY_START = 0; //starting value at ply=0
     private static final int MAXDEPTH = 8; // maximum depth of gametree to evaluate
@@ -31,41 +43,44 @@ public class Evaluation_orig {
     static double evaluateBoardStateForPlayer(Board b, int player) {
         evalCount++;
         if (b.isGameOver()) {
-            //TODO?
         }
-
-        /* + + + + + + + CURRENT WORK + + + + + ++ + + ++ ++ + + + + + + + + + + + + */
-        //TODO finish this
-        //try 1: using Max Disk strategy
-        return strategy_MaxDisk(b, player);
-        /* + + + + + + + CURRENT WORK + + + + + ++ + + ++ ++ + + + + + + + + + + + + */
-
+        double maxmoves =  strategy_MaxMoves(b, player);
+        double maxdisk = strategy_MaxDisk(b,player);
+        return maxmoves * maxdisk;
     }
-
-    private static double strategy_MaxDisk(Board b, int player) {
+    
+        private static double strategy_MaxDisk(Board b, int player) {
         int playerPieces, oppPieces;
         double totalPieces, netPieces;
-        playerPieces = BoardActor.countPiecesWithColor(player, b);
-        oppPieces = BoardActor.countPiecesWithColor(-player, b);
+        playerPieces = BoardAnalyzer.countPiecesWithColor(player, b);
+        oppPieces = BoardAnalyzer.countPiecesWithColor(-player, b);
         totalPieces = (double) playerPieces + oppPieces;
         netPieces = (playerPieces - oppPieces) / totalPieces;
-        if (OthelloDriver.ISDEBUG) {
-            System.out.println("C strategy_MaxDisk evaluation for player: " + player
-                    + "\nC\tnetPieces= " + netPieces);
-        }
         if (evalPrint) {
             b.printBoard();
             System.out.println("C ^^^^^^^ strategy_MaxDisk eval for " + player + " (" + netPieces + ") ^^^^^");
         }
         return netPieces;
+    }    
+        
+        private static double strategy_MaxMoves(Board b, int player) {
+        // TODO code this baby up
+        int maxMoves = BoardAnalyzer.countBoardMovesForPlayer(b, player);
+        if (evalPrint) {
+            System.out.println("C ====== Evaluating Board for MaxMoves " + playerColor() + " " + currentMoveBeingEvaluated + " ======");
+            b.printBoard();
+            System.out.println("C ^^^^^^^ strategy_MaxMoves eval for player:" + playerColor() + " (" + maxMoves + ") ^^^^^");
+        }
+        return (double) maxMoves;
     }
 
-    private static int calculateDepth(int movesLeft) {
-        double ratio = 0.618;
-        double depth_div_moves = (plyVal/movesLeft);
-        int depth = (int) (depth_div_moves/ratio);
-        return (depth + 1);
+    private static int calculateDepth() {
+//        int movenum = (OthelloDriver.getMoveNumber()/2) + 1;
+//        return (TOTALMOVES / 2) - Math.abs(TOTALMOVES / 2 - movenum)+1;
+//        return (TOTALMOVES - movenum);
+    return MAXDEPTH;
     }
+
     /**
      * Used by Player to get best move uses alphaBeta/minimax
      *
@@ -79,78 +94,22 @@ public class Evaluation_orig {
         double alpha = Double.MIN_VALUE;
         double beta = Double.MAX_VALUE;
         evalCount = 0;
-        System.out.println("C Thinking....");
-        depth = MAXDEPTH;
-        depth = calculateDepth(TOTALMOVES-plyVal); //maybe not -plyVal??
+//        depth = MAXDEPTH;
+        depth = calculateDepth();
+        System.out.println("C Evaluating to depth "+depth);
+//        depth = calculateDepth(TOTALMOVES - plyVal); //maybe not -plyVal??
         while (!OthelloDriver.timeUP) {
 //            return alphaBeta(b, movesList, PLY_START, player, alpha, beta, MAXDEPTH);
-            MoveWithValue tmp = alphaBeta(b, PLY_START, player, alpha, beta, depth);
-            System.out.println("C Evaluated to Depth: " + depth
-                    + "\t (" + evalCount + " evaluations" + ")");
+//NULL POINTER HERE
+            MoveWithValue tmp = alphaBeta1(b, movesList, PLY_START, player, alpha, beta, depth);
+            if (evalPrint) {
+                System.out.println("C Evaluated to Depth: " + depth
+                        + "\t (" + evalCount + " evaluations" + ")"
+                + " and move value is "+tmp.value);
+            }
             return tmp.getMove();
         }
         return Move.passMove; //if timeUP :(
-    }
-
-    //rewriting alphaBeta to generate MovesList itself (and pass moves along with it?)
-    static MoveWithValue alphaBeta(Board currentBoard,
-            int ply, int player, double alpha, double beta, int maxDepth) {
-//End of Recursion
-        plyVal++;
-//        path.append(plyVal + ": ");
-//        System.out.println("C " + path.toString());
-        System.out.println("C plyVal="+plyVal);
-        if (ply >= maxDepth || OthelloDriver.timeUP) {
-            //TODO revisit this after writing else{}!
-            Move returnMove = new Move();
-            MoveWithValue returnMove2 = new MoveWithValue(returnMove, 0);
-            returnMove2.value = evaluateBoardStateForPlayer(currentBoard, player);
-            return returnMove2;
-        } //If not end of recursion:
-        else {
-            ArrayList<Move> ms = currentBoard.populateMovesForPlayer(player);
-            //            if (moves.isEmpty()) moves.add(new Move()); //add pass move if empty
-            if (ms.isEmpty()) {
-                ms.add(Move.passMove);
-            }
-            ArrayList<MoveWithValue> mvs = convertToMVS(ms);
-            //Move bestMove = moves.get(0);
-            MoveWithValue bestMove = mvs.get(0);
-            System.out.println("C " + mvs.size() + " moves to evaluate");
-            for (MoveWithValue mv : mvs) {
-                Board newBoard = currentBoard.copyBoard();
-                BoardActor.updateBoardAfterMove(mv.getMove(), newBoard, player);
-                //check if game is over?
-                if (newBoard.isGameOver()) {
-                    System.out.println("C game over: no more evaluations -- ply = " + ply);
-                    int mypieces = BoardActor.countPiecesWithColor(player, newBoard);
-                    //TODO finish this... if game is over, who won? and is it good or bad? do we keep this move or another one?
-
-                    plyVal--;
-                    return bestMove; //probably not
-                }
-                maxDepth = calculateDepth(TOTALMOVES - plyVal);
-                MoveWithValue tempMove = alphaBeta(newBoard, ply + 1, -player, -beta, -alpha, maxDepth);
-                mv.value = -1 * tempMove.value;
-                double diff = Double.compare(mv.value, alpha);
-                boolean moveGreaterThanAlpha = (diff > 0);
-                if (moveGreaterThanAlpha) {
-                    System.out.println("C PRUNED!! at depth: " + ply);
-                    bestMove = mv;
-                    alpha = mv.value;
-                    diff = Double.compare(alpha, beta);
-                    boolean alphaGreaterThanBeta = (diff > 0);
-                    if (alphaGreaterThanBeta) {
-
-                        plyVal--;
-                        return bestMove;
-                    }
-                }
-            }
-            plyVal--;
-            return bestMove;
-//            return Move.commentMove; //TODO fix
-        }
     }
 
     static ArrayList<MoveWithValue> convertToMVS(ArrayList<Move> moves) {
@@ -161,7 +120,6 @@ public class Evaluation_orig {
         return outList;
     }
 
-    //OLD
     /**
      * performs alphaBeta pruning using minimax search algorithm
      *
@@ -174,20 +132,24 @@ public class Evaluation_orig {
      * @param maxDepth
      * @return the best move
      */
-    static Move alphaBeta1(Board currentBoard, ArrayList<Move> movesList,
+    static MoveWithValue alphaBeta1(Board currentBoard, ArrayList<Move> movesList,
             int ply, int player, double alpha, double beta, int maxDepth) {
-
-//DrMec Code + Mine
-        if (ply >= maxDepth) { //end of the recursion
-//            Move returnMove = new Move();
+        currentPlayerBeingEvaluated = player;
+        if (ply >= maxDepth || OthelloDriver.timeUP) { //end of the recursion
             MoveWithValue returnMove = new MoveWithValue();
+            if (movesList.isEmpty()) {
+                returnMove.move = Move.passMove;
+            } else {
+                returnMove.move = movesList.get(0);
+            }
 //            returnMove.value = currentBoard.evaluate();
             returnMove.value = evaluateBoardStateForPlayer(currentBoard, player);
-            return returnMove.getMove();
+            if (evalPrint) {
+                System.out.println("C !! alphaBeta1 is returning move (" + returnMove.move + ") value=" + returnMove.value);
+            }
+            return returnMove;
         } else {
-// My Code
-            //1. (skip)
-            //2. if MoveList is empty, add passmove to movelist
+            movesList = Board.populateMovesForPlayer1(currentBoard, player);
             try {
                 if (movesList.isEmpty()) {
                     movesList.add(Move.passMove);
@@ -198,37 +160,59 @@ public class Evaluation_orig {
             //3.
             MoveWithValue bestMove, tempMove, mv;
             bestMove = new MoveWithValue(movesList.get(0), 0);
+            printThisMovesList(movesList, player);
             //4. for each move in the MoveList
             for (Move m : movesList) {
+                currentMoveBeingEvaluated = m;
+//                System.out.println("watching movenumber " + movesList.indexOf(m));
                 //convert Move to MoveWithValue
                 mv = new MoveWithValue(m, 0);
                 //4a.) newBoard = currentBoard.applyMove(player, move)
                 Board newBoard = currentBoard.copyBoard();
                 BoardActor.updateBoardAfterMove(m, newBoard, player);
                 //4b.) tempMove = alphaBeta(newBoard, ply+1, -player, -beta, -alpha, maxDepth)
-                tempMove = new MoveWithValue(m, 0);
-                //alphaBeta(newBoard, movesList, ply+1, -player, -beta, -alpha, maxDepth),0);
+//                tempMove = new MoveWithValue(m, 0);
+                ArrayList templist = new ArrayList<Move>();
+                templist.addAll(movesList);
+                templist.remove(m);
+                tempMove = alphaBeta1(newBoard, templist, ply + 1, -player, -beta, -alpha, maxDepth);
                 //4c.) move.value = -tempMove.value;
                 mv.value = -tempMove.value;
                 //4d.) if moveValue > alpha
                 double diff = Double.compare(mv.value, alpha);
-                if (diff > 0) {
-                    //4d0) bestMove = move
+                boolean moveGreaterThanAlpha = (diff > 0);
+                if (moveGreaterThanAlpha) {
+                    if (evalPrint) {
+                        System.out.println("C PRUNED!! at depth: " + ply);
+                    }
                     bestMove = mv;
-                    //4d1) alpha = moveValue
                     alpha = mv.value;
-                    //4d2) if alpha > beta {return bestMove}
-                    if (alpha > beta) {
-                        return bestMove.getMove();
-                    } // this is where the pruning happens
+                    diff = Double.compare(alpha, beta);
+                    boolean alphaGreaterThanBeta = (diff > 0);
+                    if (alphaGreaterThanBeta) {
+                        plyVal--;
+                        return bestMove;
+                    }
                 }
             }
             //5.
-            return bestMove.getMove();
+            return bestMove;
         }
 
 //My Code
 //        return Move.passMove;
+    }
+
+    private static void printThisMovesList(ArrayList<Move> movesList, int player) {
+        StringBuilder sb = new StringBuilder("C Evaluating these Moves for player " + playerColor());
+        for (Move m : movesList) {
+            sb.append("(");
+            sb.append(m);
+            sb.append(") ");
+        }
+        if (evalPrint) {
+            System.out.println(sb.toString());
+        }
     }
 
     /**
@@ -249,7 +233,7 @@ public class Evaluation_orig {
         }
 
         MoveWithValue() {
-
+            // ?
         }
 
         Move getMove() {

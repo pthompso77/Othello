@@ -3,9 +3,9 @@ package gameplay;
 import java.util.ArrayList;
 
 /**
- * Reformatting and Rewriting to streamline and simplify
+ * Cleaning up for final submission
  * @author pthompso
- * @version 2019-11-09
+ * @version 2019-12-02
  */
 class BoardActor {
     
@@ -15,33 +15,35 @@ class BoardActor {
 
     static void updateBoardAfterMove(Move thisMove, Board gameboard, int color) {
         if (thisMove.isPass()) {
-            // player passes
-            return;
+            return; // player passes
         }
         int movePosition = thisMove.getMovePosition();
         if (! Board.isMoveValid(gameboard, movePosition, color)) {
-//        if (! gameboard.isMoveValid(thisMove.getMovePosition(), color)) {
-            //TODO check to see if the move is actually VALID for the player first
             return;
         }
         //TODO use a setter for this and check that we aren't changing a border space!
             //eg. between FIRSTLEGALSPACE and LASTLEGALSPACE
-        gameboard.board[thisMove.getMovePosition()] = color;
-        ArrayList<Integer> flippers;
-        flippers = thisMove.getFlippers();
-        if (flippers.isEmpty()) {
-            //find the flippers!
-            flippers = gameboard.findFlippers(thisMove.getMovePosition(), color);
+        gameboard.board[movePosition] = color; //place the player's piece
+        ArrayList<Integer> flippers = thisMove.getFlippers();
+        if (flippers.isEmpty()) { // flippers are empty only if this is the opponent's move
+            //find the flippers and set the Move's flippers attribute
+            flippers = gameboard.findFlippers(movePosition, color);
             thisMove.setFlippers(flippers);
         }
 //        Flip the pieces
         for (Integer piece : flippers) {
             gameboard.board[piece] = (-1 * gameboard.board[piece]);
         }
-        //            (return board?)
     }
     
+    /**
+     * Moved to BoardAnalyzer
+     * @param color
+     * @param b
+     * @return 
+     */
     static int countPiecesWithColor(int color, Board b) {
+        System.out.println("C !! used wrong method in BoardActor. Use BoardAnalyzer");
         int count = 0;
         for (int space : b.getBoard()) {
             if (space == color) count++;
@@ -49,12 +51,5 @@ class BoardActor {
         return count;
     }
 
-    
-
-    //    ===== BoardActor =====
-    //fun 8. Flip the pieces(board, flippers list):
-    //	for each flipper:
-    //		set board location at flipper <- (-1 * flipper)
-    //---
 
 }
