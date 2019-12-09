@@ -9,11 +9,16 @@ import java.util.ArrayList;
 
 /**
  * Contains all methods that analyze the board
- *
+ * Cleaning up for final submission
  * @author pthompso
- * @version 2019-11-09
+ * @version 2019-12-02
  */
 public class BoardAnalyzer {
+
+    static int countBoardMovesForPlayer(Board b, int player) {
+        ArrayList movesList = Board.populateMovesForPlayer1(b,player);
+        return movesList.size();
+    }
         /**
      * Examines the gameboard for empty spaces
      *
@@ -37,4 +42,14 @@ public class BoardAnalyzer {
 */
         return new ArrayList<>();
     }
+
+        
+    static int countPiecesWithColor(int color, Board b) {
+        int count = 0;
+        for (int space : b.getBoard()) {
+            if (space == color) count++;
+        }
+        return count;
+    }
+
 }

@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * Reformatting and Rewriting to streamline and simplify
+ * Cleaning up for final submission
  * @author pthompso
- * @version 2019-11-09
+ * @version 2019-12-02
  */
 public class Move {
 
