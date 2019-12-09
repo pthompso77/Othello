@@ -109,26 +109,6 @@ public class OthelloDriver {
         }
     }
 
-    static void ignore() {
-        //        DR MEC: =============================================================
-        //        Main Function:
-        //                Initialize Board:
-        //                        color <- Interact:: Get starting color from opponent
-        //                        gameboard <- Board:: New Board(color)
-        //                        Print "Playing as [color]"
-        //                        if (color is Black):
-        //                                currentPlayer = me
-        //                        else:
-        //                                currentPlayer = opponent
-        //                Print gameboard
-        //                while (Board: check if legal moves exist):
-        //                OR: while (?? : game is not over):
-        //                        currentMove <- Board:: Get Move (currentPlayer)
-        //                        Board:: Make this move (currentMove)
-    }
-
-//        DR MEC: =============================================================
-//Place the following code in your driver class
 //time array.....each position represents a percentage of the remaining time to be used
     static double timeAllocation[] = {0.015, 0.015, 0.015, 0.015, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025,
         0.048, 0.048, 0.048, 0.048, 0.048, 0.048, 0.050, 0.051, 0.052, 0.053,
@@ -139,27 +119,6 @@ public class OthelloDriver {
         0.220, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250
     };
 
-    /**
-     * Mec stuff (copied) //Example get my move..... public Move getMyMove() {
-     *
-     * moveNumber++;
-     *
-     * timeUP = false; //time up is false at the beginning of move timer = new
-     * Timer(); //initialize the new timer
-     *
-     * // int timeForMove = (int) (timeAllocation[moveNumber] * (double)
-     * timeRemaining); // //compute in seconds the amount of time for move // //
-     * // System.out.print("(C Move Time: " + timeForMove + ")"); ////
-     * timer.schedule(new InterruptTask(), timeForMove * 1000); //schedule the
-     * interrupt task // myMoves = board.bestMove(moveNumber, treeMoves); //
-     * board.applyMove((Move) myMoves.first(), OthelloBoard.MINE); // if
-     * (!timeUP) { // timer.cancel(); // } // timeRemaining -= timeForMove;
-     * //update the time remaining // // System.out.print("(C Remaining Time: "
-     * + timeRemaining + ")"); // Move selectedMove = (Move) (myMoves.first());
-     * // return selectedMove; }
-     *
-     */
-//end Mec Stuff
 //define the interrupt task
     class InterruptTask extends TimerTask {
 
@@ -167,7 +126,6 @@ public class OthelloDriver {
             System.out.println("C ****>timeup)");
             timeUP = true;
             timer.cancel();
-//TODO undo this comments above
         }
     }
 }
