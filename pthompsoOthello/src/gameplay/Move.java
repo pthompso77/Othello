@@ -54,7 +54,6 @@ public class Move {
         flippers = new ArrayList<>();
     }
     
-    //only added to add Dr. Mec's code from Evaluation.alphaBeta
     public Move() {
         movePosition = PASS_POSITION;
         flippers = new ArrayList<>();
