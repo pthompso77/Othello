@@ -89,7 +89,6 @@ public class Evaluation_orig {
      * @param player
      * @return
      */
-//my code
     static Move ab_getMyMove(Board b, ArrayList<Move> movesList, int player) {
         double alpha = Double.MIN_VALUE;
         double beta = Double.MAX_VALUE;
@@ -198,9 +197,6 @@ public class Evaluation_orig {
             //5.
             return bestMove;
         }
-
-//My Code
-//        return Move.passMove;
     }
 
     private static void printThisMovesList(ArrayList<Move> movesList, int player) {
